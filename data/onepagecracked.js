@@ -1,14 +1,15 @@
 var mainSection = getArticleSectionElementFromDocument(document);
 var numberOfPages = 0;
-var sectionsFromOtherPages = [];
+var articleSectionsFromTheOtherPages = [];
+const INDEX_OF_SECOND_PAGE = 2;
 
 if (mainSection != null && mainSection != undefined) {
-    var numberOfPages = findNumberOfPages();
+    numberOfPages = findNumberOfPages();
     console.log(numberOfPages);
     urlsOfFollowingPages = findUrlsOfFollowingPages(window.location.href, numberOfPages);
 
-    for (url of urlsOfFollowingPages) {
-        putContentOfPageInThisOne(url);
+    for (var i = INDEX_OF_SECOND_PAGE; i <=numberOfPages; i++) {
+        putContentOfPageInThisOne(urlsOfFollowingPages[i-INDEX_OF_SECOND_PAGE], i);
     }
 
 }
@@ -18,15 +19,33 @@ function findNumberOfPages() {
 }
 
 function areAllPagesLoaded() {
-    for (var i = 2; i <= numberOfPages; i++) {
-        if (sectionsFromOtherPages[i] === undefined) {
+    for (var i = INDEX_OF_SECOND_PAGE; i <= numberOfPages; i++) {
+        if (articleSectionsFromTheOtherPages[i] === undefined) {
             return false;
         }
     }
     return true;
 }
 
-function putContentOfPageInThisOne(url) {
+function loadAllImagesFromTheNewArticleSession() {
+    var allImageElements = mainSection.getElementsByTagName("img");
+    for (var i = 0; i < allImageElements.length; i++) {
+        var imageElement = allImageElements[i];
+        //imageElement.setAttribute("src", imageElement.getAttribute("src") + "?123");
+        imageElement.src = imageElement.src + "?123";
+        imageElement.setAttribute("data-img", imageElement.getAttribute("data-img") + "?123");
+    }
+}
+
+function appendContentToThisPage() {
+    for (var i = INDEX_OF_SECOND_PAGE; i <= numberOfPages; i++) {
+        //mainSection.innerHTML += articleSectionsFromTheOtherPages[i].innerHTML;
+        mainSection.parentNode.appendChild(articleSectionsFromTheOtherPages[i]);
+    }
+    loadAllImagesFromTheNewArticleSession();
+}
+
+function putContentOfPageInThisOne(url, pageNumber) {
 
     var requestForPage = new XMLHttpRequest();
     requestForPage.open("GET", url, true);
@@ -35,13 +54,17 @@ function putContentOfPageInThisOne(url) {
             if (requestForPage.status === 200) {
                 parser = new DOMParser();
                 parsedDocument = parser.parseFromString(requestForPage.response, "text/html");
-                articleSectionOfTheOtherPage = getArticleSectionElementFromDocument(parsedDocument);
-                mainSection.innerHTML += articleSectionOfTheOtherPage.innerHTML;
+                articleSectionsFromTheOtherPages[pageNumber] = getArticleSectionElementFromDocument(parsedDocument);
+
+                if (areAllPagesLoaded()) {
+                    appendContentToThisPage();
+                }
+
             } else {
                 console.error("Falha na requisiçao!");
                 console.error(url);
+                console.error(pageNumber);
                 console.error(requestForPage.status);
-
             }
         }
     };
@@ -67,7 +90,7 @@ function findUrlsOfFollowingPages(urlOfFirstPage, numberOfPages) {
 }
 
 function findTitlePortionOfTheUrl(urlOfFirstPage) {
-    var regexp = /http:\/\/www.cracked.com\/(?:blog\/)?([^\/]*)(?:\/|\.html).*/;
+    var regexp = /http:\/\/www.cracked.com\/(?:(?:blog|article)\/)?([^\/]*)(?:\/|\.html).*/;
     var info = regexp.exec(urlOfFirstPage);
     return info[1];
 }
