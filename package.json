@@ -1,0 +1,13 @@
+{
+  "title": "One-Page Cracked",
+  "name": "one-page-cracked",
+  "version": "0.0.1",
+  "description": "Shows Cracked.com articles in a single page.",
+  "main": "index.js",
+  "author": "Pablo A. Andrade",
+  "engines": {
+    "firefox": ">=38.0a1",
+    "fennec": ">=38.0a1"
+  },
+  "license": "MIT"
+}
