@@ -18,31 +18,22 @@ function findNumberOfPages() {
     return Number(document.getElementsByClassName("paginationNumber")[1].innerHTML);
 }
 
-function areAllPagesLoaded() {
-    for (var i = INDEX_OF_SECOND_PAGE; i <= numberOfPages; i++) {
-        if (articleSectionsFromTheOtherPages[i] === undefined) {
-            return false;
-        }
+function findUrlsOfFollowingPages(urlOfFirstPage, numberOfPages) {
+    var titlePortionOfFirstPage = findTitlePortionOfTheUrl(urlOfFirstPage);
+    var urlsOfAllPages = [];
+    for (var i = 2; i <= numberOfPages; i++) {
+        var titlePortionOfThisPage = titlePortionOfFirstPage + "_p" + i;
+        var urlOfNextPage = urlOfFirstPage.replace(titlePortionOfFirstPage, titlePortionOfThisPage);
+        urlsOfAllPages.push(urlOfNextPage);
     }
-    return true;
+    return urlsOfAllPages;
 }
 
-function loadAllImagesFromTheNewArticleSession() {
-    var allImageElements = mainSection.getElementsByTagName("img");
-    for (var i = 0; i < allImageElements.length; i++) {
-        var imageElement = allImageElements[i];
-        //imageElement.setAttribute("src", imageElement.getAttribute("src") + "?123");
-        imageElement.src = imageElement.src + "?123";
-        imageElement.setAttribute("data-img", imageElement.getAttribute("data-img") + "?123");
-    }
-}
 
-function appendContentToThisPage() {
-    for (var i = INDEX_OF_SECOND_PAGE; i <= numberOfPages; i++) {
-        //mainSection.innerHTML += articleSectionsFromTheOtherPages[i].innerHTML;
-        mainSection.parentNode.appendChild(articleSectionsFromTheOtherPages[i]);
-    }
-    loadAllImagesFromTheNewArticleSession();
+function findTitlePortionOfTheUrl(urlOfFirstPage) {
+    var regexp = /http:\/\/www.cracked.com\/(?:(?:blog|article)\/)?([^\/]*)(?:\/|\.html).*/;
+    var info = regexp.exec(urlOfFirstPage);
+    return info[1];
 }
 
 function putContentOfPageInThisOne(url, pageNumber) {
@@ -60,11 +51,6 @@ function putContentOfPageInThisOne(url, pageNumber) {
                     appendContentToThisPage();
                 }
 
-            } else {
-                console.error("Falha na requisiçao!");
-                console.error(url);
-                console.error(pageNumber);
-                console.error(requestForPage.status);
             }
         }
     };
@@ -77,22 +63,32 @@ function putContentOfPageInThisOne(url, pageNumber) {
 
 }
 
-
-function findUrlsOfFollowingPages(urlOfFirstPage, numberOfPages) {
-    var titlePortionOfFirstPage = findTitlePortionOfTheUrl(urlOfFirstPage);
-    var urlsOfAllPages = [];
-    for (var i = 2; i <= numberOfPages; i++) {
-        var titlePortionOfThisPage = titlePortionOfFirstPage + "_p" + i;
-        var urlOfNextPage = urlOfFirstPage.replace(titlePortionOfFirstPage, titlePortionOfThisPage);
-        urlsOfAllPages.push(urlOfNextPage);
+function areAllPagesLoaded() {
+    for (var i = INDEX_OF_SECOND_PAGE; i <= numberOfPages; i++) {
+        if (articleSectionsFromTheOtherPages[i] === undefined) {
+            return false;
+        }
     }
-    return urlsOfAllPages;
+    return true;
 }
 
-function findTitlePortionOfTheUrl(urlOfFirstPage) {
-    var regexp = /http:\/\/www.cracked.com\/(?:(?:blog|article)\/)?([^\/]*)(?:\/|\.html).*/;
-    var info = regexp.exec(urlOfFirstPage);
-    return info[1];
+function appendContentToThisPage() {
+    for (var i = INDEX_OF_SECOND_PAGE; i <= numberOfPages; i++) {
+        //mainSection.innerHTML += articleSectionsFromTheOtherPages[i].innerHTML;
+        var articleSectionFromTheOtherPage = articleSectionsFromTheOtherPages[i];
+        loadAllImagesFromArticleSection(articleSectionFromTheOtherPage);
+        mainSection.parentNode.appendChild(articleSectionFromTheOtherPage);
+    }
+}
+
+function loadAllImagesFromArticleSection(section) {
+    var allImageElements = section.getElementsByTagName("img");
+    for (var i = 0; i < allImageElements.length; i++) {
+        var imageElement = allImageElements[i];
+        var imageUrl = imageElement.getAttribute("data-img");
+        imageElement.removeAttribute("data-img");
+        imageElement.src = imageUrl;
+    }
 }
 
 function getArticleSectionElementFromDocument(htmlDocument) {
