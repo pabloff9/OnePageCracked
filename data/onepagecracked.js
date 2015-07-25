@@ -9,7 +9,7 @@ if (mainSection != null && mainSection != undefined) {
     urlsOfFollowingPages = findUrlsOfFollowingPages(window.location.href, numberOfPages);
 
     for (var i = INDEX_OF_SECOND_PAGE; i <=numberOfPages; i++) {
-        putContentOfPageInThisOne(urlsOfFollowingPages[i-INDEX_OF_SECOND_PAGE], i);
+        fetchContentFromPageAndAppendWhenReady(urlsOfFollowingPages[i-INDEX_OF_SECOND_PAGE], i);
     }
 
 }
@@ -36,12 +36,32 @@ function findTitlePortionOfTheUrl(urlOfFirstPage) {
     return info[1];
 }
 
-function putContentOfPageInThisOne(url, pageNumber) {
+function repositionSocialAndPaginationButtons() {
+    var likeOnFacebookWidget = document.getElementsByClassName("FacebookLike")[0];
+    var paginationNavBar = document.getElementsByClassName("PaginationContent")[0];
+    var shareButtons = document.getElementsByClassName("socialShareAfterContent")[0];
+    likeOnFacebookWidget.parentElement.removeChild(likeOnFacebookWidget);
+    paginationNavBar.parentElement.removeChild(paginationNavBar);
+    shareButtons.parentElement.removeChild(shareButtons);
+
+    mainSection.parentNode.appendChild(likeOnFacebookWidget);
+    mainSection.parentNode.appendChild(paginationNavBar);
+    mainSection.parentNode.appendChild(shareButtons);
+}
+
+function updatePagesCount() {
+    var totalPagesNumberElement = document.getElementsByClassName("paginationNumber")[1];
+    totalPagesNumberElement.innerHTML = 1;
+}
+function replaceNextPageWithNextArticle() {
+    
+}
+function fetchContentFromPageAndAppendWhenReady(url, pageNumber) {
 
     var requestForPage = new XMLHttpRequest();
     requestForPage.open("GET", url, true);
     requestForPage.onload = function(e) {
-        if (requestForPage.readyState === 4) {
+        if (requestForPage.readyState === XMLHttpRequest.DONE) {
             if (requestForPage.status === 200) {
                 parser = new DOMParser();
                 parsedDocument = parser.parseFromString(requestForPage.response, "text/html");
@@ -49,6 +69,9 @@ function putContentOfPageInThisOne(url, pageNumber) {
 
                 if (areAllPagesLoaded()) {
                     appendContentToThisPage();
+                    repositionSocialAndPaginationButtons();
+                    updatePagesCount();
+                    replaceNextPageWithNextArticle();
                 }
 
             }
