@@ -1,7 +1,9 @@
 var mainSection = getArticleSectionElementFromDocument(document);
 var numberOfPages = 0;
 var articleSectionsFromTheOtherPages = [];
+var urlOfNextArticle = "";
 const INDEX_OF_SECOND_PAGE = 2;
+var goToNextArticleAnchor;
 
 if (mainSection != null && mainSection != undefined) {
     numberOfPages = findNumberOfPages();
@@ -54,8 +56,13 @@ function updatePagesCount() {
     totalPagesNumberElement.innerHTML = 1;
 }
 function replaceNextPageWithNextArticle() {
-    
+    var nextPageAnchor = document.getElementsByClassName("next")[0];
+    var parent = nextPageAnchor.parentElement;
+    parent.removeChild(nextPageAnchor);
+    parent.appendChild(goToNextArticleAnchor);
+
 }
+
 function fetchContentFromPageAndAppendWhenReady(url, pageNumber) {
 
     var requestForPage = new XMLHttpRequest();
@@ -66,6 +73,10 @@ function fetchContentFromPageAndAppendWhenReady(url, pageNumber) {
                 parser = new DOMParser();
                 parsedDocument = parser.parseFromString(requestForPage.response, "text/html");
                 articleSectionsFromTheOtherPages[pageNumber] = getArticleSectionElementFromDocument(parsedDocument);
+
+                if (pageNumber === numberOfPages) {
+                    goToNextArticleAnchor = parsedDocument.getElementsByClassName("blueArrowNext")[0];
+                }
 
                 if (areAllPagesLoaded()) {
                     appendContentToThisPage();
