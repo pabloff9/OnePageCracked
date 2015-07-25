@@ -1,13 +1,11 @@
 var mainSection = getArticleSectionElementFromDocument(document);
 var numberOfPages = 0;
 var articleSectionsFromTheOtherPages = [];
-var urlOfNextArticle = "";
 const INDEX_OF_SECOND_PAGE = 2;
 var goToNextArticleAnchor;
 
 if (mainSection != null && mainSection != undefined) {
     numberOfPages = findNumberOfPages();
-    console.log(numberOfPages);
     urlsOfFollowingPages = findUrlsOfFollowingPages(window.location.href, numberOfPages);
 
     for (var i = INDEX_OF_SECOND_PAGE; i <=numberOfPages; i++) {
@@ -38,31 +36,6 @@ function findTitlePortionOfTheUrl(urlOfFirstPage) {
     return info[1];
 }
 
-function repositionSocialAndPaginationButtons() {
-    var likeOnFacebookWidget = document.getElementsByClassName("FacebookLike")[0];
-    var paginationNavBar = document.getElementsByClassName("PaginationContent")[0];
-    var shareButtons = document.getElementsByClassName("socialShareAfterContent")[0];
-    likeOnFacebookWidget.parentElement.removeChild(likeOnFacebookWidget);
-    paginationNavBar.parentElement.removeChild(paginationNavBar);
-    shareButtons.parentElement.removeChild(shareButtons);
-
-    mainSection.parentNode.appendChild(likeOnFacebookWidget);
-    mainSection.parentNode.appendChild(paginationNavBar);
-    mainSection.parentNode.appendChild(shareButtons);
-}
-
-function updatePagesCount() {
-    var totalPagesNumberElement = document.getElementsByClassName("paginationNumber")[1];
-    totalPagesNumberElement.innerHTML = 1;
-}
-function replaceNextPageWithNextArticle() {
-    var nextPageAnchor = document.getElementsByClassName("next")[0];
-    var parent = nextPageAnchor.parentElement;
-    parent.removeChild(nextPageAnchor);
-    parent.appendChild(goToNextArticleAnchor);
-
-}
-
 function fetchContentFromPageAndAppendWhenReady(url, pageNumber) {
 
     var requestForPage = new XMLHttpRequest();
@@ -89,11 +62,32 @@ function fetchContentFromPageAndAppendWhenReady(url, pageNumber) {
         }
     };
 
-    requestForPage.onerror = function (e) {
-        console.error(requestForPage.statusText);
-    };
-
     requestForPage.send(null);
+
+}
+
+function repositionSocialAndPaginationButtons() {
+    var likeOnFacebookWidget = document.getElementsByClassName("FacebookLike")[0];
+    var paginationNavBar = document.getElementsByClassName("PaginationContent")[0];
+    var shareButtons = document.getElementsByClassName("socialShareAfterContent")[0];
+    likeOnFacebookWidget.parentElement.removeChild(likeOnFacebookWidget);
+    paginationNavBar.parentElement.removeChild(paginationNavBar);
+    shareButtons.parentElement.removeChild(shareButtons);
+
+    mainSection.parentNode.appendChild(likeOnFacebookWidget);
+    mainSection.parentNode.appendChild(paginationNavBar);
+    mainSection.parentNode.appendChild(shareButtons);
+}
+
+function updatePagesCount() {
+    var totalPagesNumberElement = document.getElementsByClassName("paginationNumber")[1];
+    totalPagesNumberElement.innerHTML = 1;
+}
+function replaceNextPageWithNextArticle() {
+    var nextPageAnchor = document.getElementsByClassName("next")[0];
+    var parent = nextPageAnchor.parentElement;
+    parent.removeChild(nextPageAnchor);
+    parent.appendChild(goToNextArticleAnchor);
 
 }
 
@@ -108,7 +102,6 @@ function areAllPagesLoaded() {
 
 function appendContentToThisPage() {
     for (var i = INDEX_OF_SECOND_PAGE; i <= numberOfPages; i++) {
-        //mainSection.innerHTML += articleSectionsFromTheOtherPages[i].innerHTML;
         var articleSectionFromTheOtherPage = articleSectionsFromTheOtherPages[i];
         loadAllImagesFromArticleSection(articleSectionFromTheOtherPage);
         mainSection.parentNode.appendChild(articleSectionFromTheOtherPage);
