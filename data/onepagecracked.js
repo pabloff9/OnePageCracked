@@ -15,7 +15,7 @@ if (mainSection != null && mainSection != undefined) {
 }
 
 function findNumberOfPages() {
-    return Number(document.getElementsByClassName("paginationNumber")[1].innerHTML);
+    return Number(document.getElementsByClassName("paginationNumber")[1].textContent);
 }
 
 function findUrlsOfFollowingPages(urlOfFirstPage, numberOfPages) {
