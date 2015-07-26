@@ -81,7 +81,7 @@ function repositionSocialAndPaginationButtons() {
 
 function updatePagesCount() {
     var totalPagesNumberElement = document.getElementsByClassName("paginationNumber")[1];
-    totalPagesNumberElement.innerHTML = 1;
+    totalPagesNumberElement.textContent = "1";
 }
 function replaceNextPageWithNextArticle() {
     var nextPageAnchor = document.getElementsByClassName("next")[0];
