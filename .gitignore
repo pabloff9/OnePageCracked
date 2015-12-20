@@ -1,1 +1,3 @@
 *.xpi
+/index-compiled.js
+/index-compiled.js.map
