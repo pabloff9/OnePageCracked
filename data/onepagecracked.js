@@ -94,7 +94,7 @@ function replaceNextPageWithNextArticle () {
 
 function areAllPagesLoaded () {
     for (let i = INDEX_OF_SECOND_PAGE; i <= numberOfPages; i++) {
-        if (typeof (articleSectionsFromTheOtherPages[i]) === "undefined") {
+        if (typeof (articleSectionsFromTheOtherPages[i]) !== "undefined") {
             return false;
         }
     }
@@ -122,7 +122,7 @@ function loadAllImagesFromArticleSection (section) {
 function getArticleSectionElementFromDocument (htmlDocument) {
     // var rightSide = htmlDocument.getElementById("safePlace");
     var article = htmlDocument.getElementsByTagName("article")[0];
-    if (article !== null && typeof (article) === "undefined") {
+    if (article !== null && typeof (article) !== "undefined") {
         const bodySection = article.getElementsByTagName("section")[0];
         return bodySection.getElementsByTagName("section")[0];
     }
