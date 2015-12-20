@@ -3,49 +3,48 @@ var numberOfPages = 0;
 const articleSectionsFromTheOtherPages = [];
 const INDEX_OF_SECOND_PAGE = 2;
 var goToNextArticleAnchor;
-var urlsOfFollowingPages;
 
-if (mainSection !== null && typeof (mainSection) !== "undefined") {
+if (mainSection !== null && mainSection !== undefined) {
     numberOfPages = findNumberOfPages();
     urlsOfFollowingPages = findUrlsOfFollowingPages(window.location.href, numberOfPages);
 
-    for (let i = INDEX_OF_SECOND_PAGE; i <= numberOfPages; i++) {
-        fetchContentFromPageAndAppendWhenReady(urlsOfFollowingPages[i - INDEX_OF_SECOND_PAGE], i);
+    for (var i = INDEX_OF_SECOND_PAGE; i <=numberOfPages; i++) {
+        fetchContentFromPageAndAppendWhenReady(urlsOfFollowingPages[i-INDEX_OF_SECOND_PAGE], i);
     }
 
 }
 
-function findNumberOfPages () {
+function findNumberOfPages() {
     return Number(document.getElementsByClassName("paginationNumber")[1].textContent);
 }
 
-function findUrlsOfFollowingPages (urlOfFirstPage, totalNumberOfPages) {
-    const titlePortionOfFirstPage = findTitlePortionOfTheUrl(urlOfFirstPage);
+function findUrlsOfFollowingPages(urlOfFirstPage, numberOfPages) {
+    let titlePortionOfFirstPage = findTitlePortionOfTheUrl(urlOfFirstPage);
     let urlsOfAllPages = [];
-    for (let i = 2; i <= totalNumberOfPages; i++) {
-        const titlePortionOfThisPage = titlePortionOfFirstPage + "_p" + i;
-        const urlOfNextPage = urlOfFirstPage.replace(titlePortionOfFirstPage, titlePortionOfThisPage);
+    for (let i = 2; i <= numberOfPages; i++) {
+        var titlePortionOfThisPage = titlePortionOfFirstPage + "_p" + i;
+        var urlOfNextPage = urlOfFirstPage.replace(titlePortionOfFirstPage, titlePortionOfThisPage);
         urlsOfAllPages.push(urlOfNextPage);
     }
     return urlsOfAllPages;
 }
 
 
-function findTitlePortionOfTheUrl (urlOfFirstPage) {
+function findTitlePortionOfTheUrl(urlOfFirstPage) {
     const regexp = /http:\/\/www.cracked.com\/(?:(?:blog|article)\/)?([^\/]*)(?:\/|\.html).*/;
-    const info = regexp.exec(urlOfFirstPage);
+    let info = regexp.exec(urlOfFirstPage);
     return info[1];
 }
 
-function fetchContentFromPageAndAppendWhenReady (url, pageNumber) {
+function fetchContentFromPageAndAppendWhenReady(url, pageNumber) {
 
     let requestForPage = new XMLHttpRequest();
     requestForPage.open("GET", url, true);
-    requestForPage.onload = function () {
+    requestForPage.onload = function(e) {
         if (requestForPage.readyState === XMLHttpRequest.DONE) {
             if (requestForPage.status === 200) {
-                const parser = new DOMParser();
-                const parsedDocument = parser.parseFromString(requestForPage.response, "text/html");
+                parser = new DOMParser();
+                parsedDocument = parser.parseFromString(requestForPage.response, "text/html");
                 articleSectionsFromTheOtherPages[pageNumber] = getArticleSectionElementFromDocument(parsedDocument);
 
                 if (pageNumber === numberOfPages) {
@@ -67,7 +66,7 @@ function fetchContentFromPageAndAppendWhenReady (url, pageNumber) {
 
 }
 
-function repositionSocialAndPaginationButtons () {
+function repositionSocialAndPaginationButtons() {
     var likeOnFacebookWidget = document.getElementsByClassName("FacebookLike")[0];
     var paginationNavBar = document.getElementsByClassName("PaginationContent")[0];
     var shareButtons = document.getElementsByClassName("socialShareAfterContent")[0];
@@ -80,11 +79,11 @@ function repositionSocialAndPaginationButtons () {
     mainSection.parentNode.appendChild(shareButtons);
 }
 
-function updatePagesCount () {
+function updatePagesCount() {
     var totalPagesNumberElement = document.getElementsByClassName("paginationNumber")[1];
     totalPagesNumberElement.textContent = "1";
 }
-function replaceNextPageWithNextArticle () {
+function replaceNextPageWithNextArticle() {
     var nextPageAnchor = document.getElementsByClassName("next")[0];
     var parent = nextPageAnchor.parentElement;
     parent.removeChild(nextPageAnchor);
@@ -92,38 +91,38 @@ function replaceNextPageWithNextArticle () {
 
 }
 
-function areAllPagesLoaded () {
-    for (let i = INDEX_OF_SECOND_PAGE; i <= numberOfPages; i++) {
-        if (typeof (articleSectionsFromTheOtherPages[i]) !== "undefined") {
+function areAllPagesLoaded() {
+    for (var i = INDEX_OF_SECOND_PAGE; i <= numberOfPages; i++) {
+        if (articleSectionsFromTheOtherPages[i] === undefined) {
             return false;
         }
     }
     return true;
 }
 
-function appendContentToThisPage () {
-    for (let i = INDEX_OF_SECOND_PAGE; i <= numberOfPages; i++) {
-        const articleSectionFromTheOtherPage = articleSectionsFromTheOtherPages[i];
+function appendContentToThisPage() {
+    for (var i = INDEX_OF_SECOND_PAGE; i <= numberOfPages; i++) {
+        var articleSectionFromTheOtherPage = articleSectionsFromTheOtherPages[i];
         loadAllImagesFromArticleSection(articleSectionFromTheOtherPage);
         mainSection.parentNode.appendChild(articleSectionFromTheOtherPage);
     }
 }
 
-function loadAllImagesFromArticleSection (section) {
+function loadAllImagesFromArticleSection(section) {
     var allImageElements = section.getElementsByTagName("img");
-    for (let i = 0; i < allImageElements.length; i++) {
-        const imageElement = allImageElements[i];
-        const imageUrl = imageElement.getAttribute("data-img");
+    for (var i = 0; i < allImageElements.length; i++) {
+        var imageElement = allImageElements[i];
+        var imageUrl = imageElement.getAttribute("data-img");
         imageElement.removeAttribute("data-img");
         imageElement.src = imageUrl;
     }
 }
 
-function getArticleSectionElementFromDocument (htmlDocument) {
-    // var rightSide = htmlDocument.getElementById("safePlace");
+function getArticleSectionElementFromDocument(htmlDocument) {
+    var rightSide = htmlDocument.getElementById("safePlace");
     var article = htmlDocument.getElementsByTagName("article")[0];
-    if (article !== null && typeof (article) !== "undefined") {
-        const bodySection = article.getElementsByTagName("section")[0];
+    if (article !== null && article !== undefined) {
+        var bodySection = article.getElementsByTagName("section")[0];
         return bodySection.getElementsByTagName("section")[0];
     }
 }
