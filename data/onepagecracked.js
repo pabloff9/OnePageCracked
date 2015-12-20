@@ -6,7 +6,7 @@ let goToNextArticleAnchor = null;
 
 if (mainSection !== null && typeof (mainSection) !== "undefined") {
     numberOfPages = findNumberOfPages();
-    const urlsOfFollowingPages = findUrlsOfFollowingPages(window.location.href, numberOfPages);
+    const urlsOfFollowingPages = findUrlsOfFollowingPages(window.location.href);
 
     for (let i = INDEX_OF_SECOND_PAGE; i <= numberOfPages; i++) {
         fetchContentFromPageAndAppendWhenReady(urlsOfFollowingPages[i - INDEX_OF_SECOND_PAGE], i);
@@ -18,7 +18,7 @@ function findNumberOfPages () {
     return Number(document.getElementsByClassName("paginationNumber")[1].textContent);
 }
 
-function findUrlsOfFollowingPages (urlOfFirstPage, numberOfPages) {
+function findUrlsOfFollowingPages (urlOfFirstPage) {
     let titlePortionOfFirstPage = findTitlePortionOfTheUrl(urlOfFirstPage);
     let urlsOfAllPages = [];
     for (let i = 2; i <= numberOfPages; i++) {
@@ -40,7 +40,7 @@ function fetchContentFromPageAndAppendWhenReady (url, pageNumber) {
 
     let requestForPage = new XMLHttpRequest();
     requestForPage.open("GET", url, true);
-    requestForPage.onload = function (e) {
+    requestForPage.onload = function () {
         if (requestForPage.readyState === XMLHttpRequest.DONE) {
             if (requestForPage.status === 200) {
                 parser = new DOMParser();
