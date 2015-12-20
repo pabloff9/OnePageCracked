@@ -1,14 +1,14 @@
 const mainSection = getArticleSectionElementFromDocument(document);
-var numberOfPages = 0;
+let numberOfPages = 0;
 const articleSectionsFromTheOtherPages = [];
 const INDEX_OF_SECOND_PAGE = 2;
-var goToNextArticleAnchor;
+let goToNextArticleAnchor = null;
 
 if (mainSection !== null && mainSection !== undefined) {
     numberOfPages = findNumberOfPages();
     urlsOfFollowingPages = findUrlsOfFollowingPages(window.location.href, numberOfPages);
 
-    for (var i = INDEX_OF_SECOND_PAGE; i <=numberOfPages; i++) {
+    for (let i = INDEX_OF_SECOND_PAGE; i <=numberOfPages; i++) {
         fetchContentFromPageAndAppendWhenReady(urlsOfFollowingPages[i-INDEX_OF_SECOND_PAGE], i);
     }
 
@@ -22,8 +22,8 @@ function findUrlsOfFollowingPages(urlOfFirstPage, numberOfPages) {
     let titlePortionOfFirstPage = findTitlePortionOfTheUrl(urlOfFirstPage);
     let urlsOfAllPages = [];
     for (let i = 2; i <= numberOfPages; i++) {
-        var titlePortionOfThisPage = titlePortionOfFirstPage + "_p" + i;
-        var urlOfNextPage = urlOfFirstPage.replace(titlePortionOfFirstPage, titlePortionOfThisPage);
+        const titlePortionOfThisPage = titlePortionOfFirstPage + "_p" + i;
+        const urlOfNextPage = urlOfFirstPage.replace(titlePortionOfFirstPage, titlePortionOfThisPage);
         urlsOfAllPages.push(urlOfNextPage);
     }
     return urlsOfAllPages;
@@ -67,9 +67,9 @@ function fetchContentFromPageAndAppendWhenReady(url, pageNumber) {
 }
 
 function repositionSocialAndPaginationButtons() {
-    var likeOnFacebookWidget = document.getElementsByClassName("FacebookLike")[0];
-    var paginationNavBar = document.getElementsByClassName("PaginationContent")[0];
-    var shareButtons = document.getElementsByClassName("socialShareAfterContent")[0];
+    const likeOnFacebookWidget = document.getElementsByClassName("FacebookLike")[0];
+    const paginationNavBar = document.getElementsByClassName("PaginationContent")[0];
+    const shareButtons = document.getElementsByClassName("socialShareAfterContent")[0];
     likeOnFacebookWidget.parentElement.removeChild(likeOnFacebookWidget);
     paginationNavBar.parentElement.removeChild(paginationNavBar);
     shareButtons.parentElement.removeChild(shareButtons);
@@ -80,19 +80,19 @@ function repositionSocialAndPaginationButtons() {
 }
 
 function updatePagesCount() {
-    var totalPagesNumberElement = document.getElementsByClassName("paginationNumber")[1];
+    const totalPagesNumberElement = document.getElementsByClassName("paginationNumber")[1];
     totalPagesNumberElement.textContent = "1";
 }
 function replaceNextPageWithNextArticle() {
-    var nextPageAnchor = document.getElementsByClassName("next")[0];
-    var parent = nextPageAnchor.parentElement;
+    const nextPageAnchor = document.getElementsByClassName("next")[0];
+    const parent = nextPageAnchor.parentElement;
     parent.removeChild(nextPageAnchor);
     parent.appendChild(goToNextArticleAnchor);
 
 }
 
 function areAllPagesLoaded() {
-    for (var i = INDEX_OF_SECOND_PAGE; i <= numberOfPages; i++) {
+    for (let i = INDEX_OF_SECOND_PAGE; i <= numberOfPages; i++) {
         if (articleSectionsFromTheOtherPages[i] === undefined) {
             return false;
         }
@@ -101,28 +101,28 @@ function areAllPagesLoaded() {
 }
 
 function appendContentToThisPage() {
-    for (var i = INDEX_OF_SECOND_PAGE; i <= numberOfPages; i++) {
-        var articleSectionFromTheOtherPage = articleSectionsFromTheOtherPages[i];
+    for (let i = INDEX_OF_SECOND_PAGE; i <= numberOfPages; i++) {
+        const articleSectionFromTheOtherPage = articleSectionsFromTheOtherPages[i];
         loadAllImagesFromArticleSection(articleSectionFromTheOtherPage);
         mainSection.parentNode.appendChild(articleSectionFromTheOtherPage);
     }
 }
 
 function loadAllImagesFromArticleSection(section) {
-    var allImageElements = section.getElementsByTagName("img");
-    for (var i = 0; i < allImageElements.length; i++) {
-        var imageElement = allImageElements[i];
-        var imageUrl = imageElement.getAttribute("data-img");
+    const allImageElements = section.getElementsByTagName("img");
+    for (let i = 0; i < allImageElements.length; i++) {
+        const imageElement = allImageElements[i];
+        const imageUrl = imageElement.getAttribute("data-img");
         imageElement.removeAttribute("data-img");
         imageElement.src = imageUrl;
     }
 }
 
 function getArticleSectionElementFromDocument(htmlDocument) {
-    var rightSide = htmlDocument.getElementById("safePlace");
-    var article = htmlDocument.getElementsByTagName("article")[0];
+    const rightSide = htmlDocument.getElementById("safePlace");
+    const article = htmlDocument.getElementsByTagName("article")[0];
     if (article !== null && article !== undefined) {
-        var bodySection = article.getElementsByTagName("section")[0];
+        const bodySection = article.getElementsByTagName("section")[0];
         return bodySection.getElementsByTagName("section")[0];
     }
 }
