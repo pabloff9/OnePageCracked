@@ -8,17 +8,17 @@ if (mainSection !== null && typeof (mainSection) !== "undefined") {
     numberOfPages = findNumberOfPages();
     urlsOfFollowingPages = findUrlsOfFollowingPages(window.location.href, numberOfPages);
 
-    for (let i = INDEX_OF_SECOND_PAGE; i <=numberOfPages; i++) {
-        fetchContentFromPageAndAppendWhenReady(urlsOfFollowingPages[i-INDEX_OF_SECOND_PAGE], i);
+    for (let i = INDEX_OF_SECOND_PAGE; i <= numberOfPages; i++) {
+        fetchContentFromPageAndAppendWhenReady(urlsOfFollowingPages[i - INDEX_OF_SECOND_PAGE], i);
     }
 
 }
 
-function findNumberOfPages() {
+function findNumberOfPages () {
     return Number(document.getElementsByClassName("paginationNumber")[1].textContent);
 }
 
-function findUrlsOfFollowingPages(urlOfFirstPage, numberOfPages) {
+function findUrlsOfFollowingPages (urlOfFirstPage, numberOfPages) {
     let titlePortionOfFirstPage = findTitlePortionOfTheUrl(urlOfFirstPage);
     let urlsOfAllPages = [];
     for (let i = 2; i <= numberOfPages; i++) {
@@ -30,17 +30,17 @@ function findUrlsOfFollowingPages(urlOfFirstPage, numberOfPages) {
 }
 
 
-function findTitlePortionOfTheUrl(urlOfFirstPage) {
+function findTitlePortionOfTheUrl (urlOfFirstPage) {
     const regexp = /http:\/\/www.cracked.com\/(?:(?:blog|article)\/)?([^\/]*)(?:\/|\.html).*/;
     let info = regexp.exec(urlOfFirstPage);
     return info[1];
 }
 
-function fetchContentFromPageAndAppendWhenReady(url, pageNumber) {
+function fetchContentFromPageAndAppendWhenReady (url, pageNumber) {
 
     let requestForPage = new XMLHttpRequest();
     requestForPage.open("GET", url, true);
-    requestForPage.onload = function(e) {
+    requestForPage.onload = function (e) {
         if (requestForPage.readyState === XMLHttpRequest.DONE) {
             if (requestForPage.status === 200) {
                 parser = new DOMParser();
@@ -66,7 +66,7 @@ function fetchContentFromPageAndAppendWhenReady(url, pageNumber) {
 
 }
 
-function repositionSocialAndPaginationButtons() {
+function repositionSocialAndPaginationButtons () {
     const likeOnFacebookWidget = document.getElementsByClassName("FacebookLike")[0];
     const paginationNavBar = document.getElementsByClassName("PaginationContent")[0];
     const shareButtons = document.getElementsByClassName("socialShareAfterContent")[0];
@@ -79,11 +79,11 @@ function repositionSocialAndPaginationButtons() {
     mainSection.parentNode.appendChild(shareButtons);
 }
 
-function updatePagesCount() {
+function updatePagesCount () {
     const totalPagesNumberElement = document.getElementsByClassName("paginationNumber")[1];
     totalPagesNumberElement.textContent = "1";
 }
-function replaceNextPageWithNextArticle() {
+function replaceNextPageWithNextArticle () {
     const nextPageAnchor = document.getElementsByClassName("next")[0];
     const parent = nextPageAnchor.parentElement;
     parent.removeChild(nextPageAnchor);
@@ -91,16 +91,16 @@ function replaceNextPageWithNextArticle() {
 
 }
 
-function areAllPagesLoaded() {
+function areAllPagesLoaded () {
     for (let i = INDEX_OF_SECOND_PAGE; i <= numberOfPages; i++) {
-        if (typeof(articleSectionsFromTheOtherPages[i]) === "undefined") {
+        if (typeof (articleSectionsFromTheOtherPages[i]) === "undefined") {
             return false;
         }
     }
     return true;
 }
 
-function appendContentToThisPage() {
+function appendContentToThisPage () {
     for (let i = INDEX_OF_SECOND_PAGE; i <= numberOfPages; i++) {
         const articleSectionFromTheOtherPage = articleSectionsFromTheOtherPages[i];
         loadAllImagesFromArticleSection(articleSectionFromTheOtherPage);
@@ -108,7 +108,7 @@ function appendContentToThisPage() {
     }
 }
 
-function loadAllImagesFromArticleSection(section) {
+function loadAllImagesFromArticleSection (section) {
     const allImageElements = section.getElementsByTagName("img");
     for (let i = 0; i < allImageElements.length; i++) {
         const imageElement = allImageElements[i];
@@ -118,10 +118,10 @@ function loadAllImagesFromArticleSection(section) {
     }
 }
 
-function getArticleSectionElementFromDocument(htmlDocument) {
+function getArticleSectionElementFromDocument (htmlDocument) {
     const rightSide = htmlDocument.getElementById("safePlace");
     const article = htmlDocument.getElementsByTagName("article")[0];
-    if (article !== null && typeof(article)!== "undefined") {
+    if (article !== null && typeof (article) !== "undefined") {
         const bodySection = article.getElementsByTagName("section")[0];
         return bodySection.getElementsByTagName("section")[0];
     }
