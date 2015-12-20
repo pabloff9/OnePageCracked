@@ -6,7 +6,7 @@ let goToNextArticleAnchor = null;
 
 if (mainSection !== null && typeof (mainSection) !== "undefined") {
     numberOfPages = findNumberOfPages();
-    urlsOfFollowingPages = findUrlsOfFollowingPages(window.location.href, numberOfPages);
+    const urlsOfFollowingPages = findUrlsOfFollowingPages(window.location.href, numberOfPages);
 
     for (let i = INDEX_OF_SECOND_PAGE; i <= numberOfPages; i++) {
         fetchContentFromPageAndAppendWhenReady(urlsOfFollowingPages[i - INDEX_OF_SECOND_PAGE], i);
@@ -119,7 +119,7 @@ function loadAllImagesFromArticleSection (section) {
 }
 
 function getArticleSectionElementFromDocument (htmlDocument) {
-    const rightSide = htmlDocument.getElementById("safePlace");
+    // const rightSide = htmlDocument.getElementById("safePlace");
     const article = htmlDocument.getElementsByTagName("article")[0];
     if (article !== null && typeof (article) !== "undefined") {
         const bodySection = article.getElementsByTagName("section")[0];
