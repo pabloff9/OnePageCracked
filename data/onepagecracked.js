@@ -4,7 +4,7 @@ const articleSectionsFromTheOtherPages = [];
 const INDEX_OF_SECOND_PAGE = 2;
 let goToNextArticleAnchor = null;
 
-if (mainSection !== null && mainSection !== undefined) {
+if (mainSection !== null && typeof (mainSection) !== "undefined") {
     numberOfPages = findNumberOfPages();
     urlsOfFollowingPages = findUrlsOfFollowingPages(window.location.href, numberOfPages);
 
@@ -93,7 +93,7 @@ function replaceNextPageWithNextArticle() {
 
 function areAllPagesLoaded() {
     for (let i = INDEX_OF_SECOND_PAGE; i <= numberOfPages; i++) {
-        if (articleSectionsFromTheOtherPages[i] === undefined) {
+        if (typeof(articleSectionsFromTheOtherPages[i]) === "undefined") {
             return false;
         }
     }
@@ -121,7 +121,7 @@ function loadAllImagesFromArticleSection(section) {
 function getArticleSectionElementFromDocument(htmlDocument) {
     const rightSide = htmlDocument.getElementById("safePlace");
     const article = htmlDocument.getElementsByTagName("article")[0];
-    if (article !== null && article !== undefined) {
+    if (article !== null && typeof(article)!== "undefined") {
         const bodySection = article.getElementsByTagName("section")[0];
         return bodySection.getElementsByTagName("section")[0];
     }
