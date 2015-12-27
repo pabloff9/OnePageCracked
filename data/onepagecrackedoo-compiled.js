@@ -1,158 +1,156 @@
-interface CrackedPost {
-    getUrl(): string;
-    numberOfPages(): number;
-    urlsOfThePagesOtherThanTheFirst(): string[];
-    titlePortionOfTheUrl(): string;
-    updatePagesCount(): void;
-}
-
-class CrackedArticle implements CrackedPost {
-
-    private url;
-    private pagesOtherThanTheFirst: HTMLDocument[];
-
-    constructor(url) {
+var CrackedArticle = (function () {
+    function CrackedArticle(url) {
         this.url = url;
-        this.pagesOtherThanTheFirst = [];
+        this.pages = [];
+        var urlsOfThePages = this.urlsOfThePagesOtherThanTheFirst();
+        var firstPage = new CrackedArticlePage(urlsOfThePages[0], 0, true);
+        this.pages.push(firstPage);
+        for (var i = 2; i <= urlsOfThePages.length; i++) {
+            var page = new CrackedArticlePage(urlsOfThePages[i - 1], i, false);
+            this.pages.push(page);
+        }
     }
-
-    loadAllPages(): void {
-        let urlsOfTheNextPages = this.urlsOfThePagesOtherThanTheFirst();
-        /* tslint:disable: no-var-keyword */
-        for (var i = 0; i < urlsOfTheNextPages.length; i++) {
-        /* ts:lint:enable: no-var-keyword */
-            this.loadPage(urlsOfTheNextPages[i], i, (pageNumber: number, pageContent: HTMLDocument): void => {
-                this.pagesOtherThanTheFirst[pageNumber] = pageContent;
-                this.loadAllImagesFromPage(pageNumber);
-                if (this.areAllPagesLoaded()) {
-                    this.appendOtherPagesToTheFirstPage();
-                    this.repositionSocialAndPaginationButtons();
-                    this.updatePagesCount();
-                    this.replaceNextPageWithNextArticle();
+    CrackedArticle.prototype.loadAllPages = function () {
+        var _this = this;
+        for (var i = 1; i < this.pages.length; i++) {
+            this.pages[i].load(function () {
+                if (_this.areAllPagesLoaded()) {
+                    _this.appendOtherPagesToTheFirstPage();
+                    _this.repositionSocialAndPaginationButtons();
+                    _this.updatePagesCount();
+                    _this.replaceNextPageWithNextArticle();
                 }
             });
         }
-    }
-
-    private loadPage(url: string, pageNumber: number, onPageLoaded: (pageNumber: number, pageContent: HTMLDocument) => void): void {
-        let requestForPage = new XMLHttpRequest();
-        requestForPage.open("GET", url, true);
-        requestForPage.onload = () => {
-            if (requestForPage.readyState === XMLHttpRequest.DONE) {
-                if (requestForPage.status === 200) {
-                    const parser = new DOMParser();
-                    onPageLoaded(pageNumber, parser.parseFromString(requestForPage.response, "text/html"));
-                }
-            }
-        };
-
-        requestForPage.send(null);
-    }
-
-    updatePagesCount (): void {
-        const totalPagesNumberElement = document.getElementsByClassName("paginationNumber")[1];
+    };
+    CrackedArticle.prototype.updatePagesCount = function () {
+        var totalPagesNumberElement = document.getElementsByClassName("paginationNumber")[1];
         totalPagesNumberElement.textContent = "1";
-    }
-
-    private repositionSocialAndPaginationButtons(): void {
-        const likeOnFacebookWidget = document.getElementsByClassName("FacebookLike")[0];
-        const paginationNavBar = document.getElementsByClassName("PaginationContent")[0];
-        const shareButtons = document.getElementsByClassName("socialShareAfterContent")[0];
+    };
+    CrackedArticle.prototype.repositionSocialAndPaginationButtons = function () {
+        var likeOnFacebookWidget = document.getElementsByClassName("FacebookLike")[0];
+        var paginationNavBar = document.getElementsByClassName("PaginationContent")[0];
+        var shareButtons = document.getElementsByClassName("socialShareAfterContent")[0];
         likeOnFacebookWidget.parentElement.removeChild(likeOnFacebookWidget);
         paginationNavBar.parentElement.removeChild(paginationNavBar);
         shareButtons.parentElement.removeChild(shareButtons);
-
-        this.getContentElementFromPage(document).appendChild(likeOnFacebookWidget);
-        this.getContentElementFromPage(document).parentNode.appendChild(paginationNavBar);
-        this.getContentElementFromPage(document).parentNode.appendChild(shareButtons);
-    }
-
-    private appendOtherPagesToTheFirstPage(): void {
-        let elementToAppendContentTo = this.getContentElementFromPage(document);
-        for (let i = 0; i < this.pagesOtherThanTheFirst.length; i++) {
-            let contentToBeAdded = this.getContentElementFromPage(this.pagesOtherThanTheFirst[i]);
-            elementToAppendContentTo.parentNode.appendChild(contentToBeAdded);
+        this.pages[0].getContentElement().parentNode.appendChild(likeOnFacebookWidget);
+        this.pages[0].getContentElement().parentNode.appendChild(paginationNavBar);
+        this.pages[0].getContentElement().parentNode.appendChild(shareButtons);
+    };
+    CrackedArticle.prototype.appendOtherPagesToTheFirstPage = function () {
+        for (var i = 1; i < this.pages.length; i++) {
+            this.pages[i].loadAllImages();
+            this.pages[0].appendContentFromPage(this.pages[i]);
         }
-    }
-
-    private getContentElementFromPage(page: HTMLDocument): HTMLElement {
-        let article = page.getElementsByTagName("article")[0];
-        if (article !== null && typeof (article) !== "undefined") {
-            const bodySection = article.getElementsByTagName("section")[0];
-            return bodySection.getElementsByTagName("section")[0];
-        }
-    }
-
-    private areAllPagesLoaded(): boolean {
-        for (let i = 0; i < this.numberOfPages() - 1; i++) {
-            if (this.pagesOtherThanTheFirst[i] === undefined) {
+    };
+    CrackedArticle.prototype.areAllPagesLoaded = function () {
+        for (var _i = 0, _a = this.pages; _i < _a.length; _i++) {
+            var page = _a[_i];
+            if (!page.isLoaded()) {
                 return false;
             }
         }
         return true;
-    }
-
-    private loadAllImagesFromPage(pageNumber: number): void {
-        const allImageElements = this.pagesOtherThanTheFirst[pageNumber].getElementsByTagName("img");
-        for (let i = 0; i < allImageElements.length; i++) {
-            const imageElement = allImageElements[i];
-            const imageUrl = imageElement.getAttribute("data-img");
-            imageElement.removeAttribute("data-img");
-            imageElement.src = imageUrl;
-        }
-    }
-
-    getUrl(): string {
+    };
+    CrackedArticle.prototype.getUrl = function () {
         return this.url;
-    }
-
-    numberOfPages(): number {
+    };
+    CrackedArticle.prototype.numberOfPages = function () {
         return Number(document.getElementsByClassName("paginationNumber")[1].textContent);
-    }
-
-    urlsOfThePagesOtherThanTheFirst(): string[] {
-        const urlsOfAllPages = [];
-        const titlePortionOfFirstPage = this.titlePortionOfTheUrl();
-        for (let i = 2; i <= this.numberOfPages(); i++) {
-            const titlePortionOfThisPage = titlePortionOfFirstPage + "_p" + i;
-            const urlOfNextPage = this.url.replace(titlePortionOfFirstPage, titlePortionOfThisPage);
+    };
+    CrackedArticle.prototype.urlsOfThePagesOtherThanTheFirst = function () {
+        var urlsOfAllPages = [];
+        urlsOfAllPages.push(this.url);
+        var titlePortionOfFirstPage = this.titlePortionOfTheUrl();
+        for (var i = 2; i <= this.numberOfPages(); i++) {
+            var titlePortionOfThisPage = titlePortionOfFirstPage + "_p" + i;
+            var urlOfNextPage = this.url.replace(titlePortionOfFirstPage, titlePortionOfThisPage);
             urlsOfAllPages.push(urlOfNextPage);
         }
         return urlsOfAllPages;
-    }
-
-    titlePortionOfTheUrl(): string {
-        const regexp = /http:\/\/www.cracked.com\/(?:(?:blog|article)\/)?([^\/]*)(?:\/|\.html).*/;
-        let info = regexp.exec(this.url);
+    };
+    CrackedArticle.prototype.titlePortionOfTheUrl = function () {
+        var regexp = /http:\/\/www.cracked.com\/(?:(?:blog|article)\/)?([^\/]*)(?:\/|\.html).*/;
+        var info = regexp.exec(this.url);
         return info[1];
-    }
-
-    private replaceNextPageWithNextArticle (): void {
-        const nextPageAnchor = document.getElementsByClassName("next")[0];
-        const parent = nextPageAnchor.parentElement;
+    };
+    CrackedArticle.prototype.replaceNextPageWithNextArticle = function () {
+        var nextPageAnchor = document.getElementsByClassName("next")[0];
+        var parent = nextPageAnchor.parentElement;
         parent.removeChild(nextPageAnchor);
         parent.appendChild(this.getNextArticleAnchor());
+    };
+    CrackedArticle.prototype.getNextArticleAnchor = function () {
+        return this.pages[this.pages.length - 1].getHTMLDocument().getElementsByClassName("blueArrowNext")[0];
+    };
+    return CrackedArticle;
+})();
+var CrackedArticlePage = (function () {
+    function CrackedArticlePage(pageUrl, pageNumber, isFirstPage) {
+        this.url = pageUrl;
+        this.pageNumber = pageNumber;
+        if (isFirstPage) {
+            this.htmlDocument = document;
+            this.loaded = true;
+        } else {
+            this.loaded = false;
+            this.htmlDocument = null;
+        }
     }
-
-    private getNextArticleAnchor(): Element {
-        return this.pagesOtherThanTheFirst[this.pagesOtherThanTheFirst.length - 1].getElementsByClassName("blueArrowNext")[0];
-    }
-
-}
-
-//function areWeOnTheMobileVersion(): boolean {
-//    return document.getElementById("mobileWrapper") != null ; // this might break anytime. Stay alert.
-//}
-
-window.onload = () => {
-    let article = new CrackedArticle(window.location.href);
+    CrackedArticlePage.prototype.isLoaded = function () {
+        return this.loaded;
+    };
+    CrackedArticlePage.prototype.appendContentFromPage = function (page) {
+        this.getContentElement().parentNode.appendChild(page.getContentElement());
+    };
+    CrackedArticlePage.prototype.getContentElement = function () {
+        var article = this.htmlDocument.getElementsByTagName("article")[0];
+        if (article !== null && typeof article !== "undefined") {
+            var bodySection = article.getElementsByTagName("section")[0];
+            return bodySection.getElementsByTagName("section")[0];
+        }
+    };
+    CrackedArticlePage.prototype.getHTMLDocument = function () {
+        return this.htmlDocument;
+    };
+    CrackedArticlePage.prototype.load = function (onDone) {
+        var _this = this;
+        var requestForPage = new XMLHttpRequest();
+        requestForPage.open("GET", this.url, true);
+        requestForPage.onload = function () {
+            if (requestForPage.readyState === XMLHttpRequest.DONE) {
+                if (requestForPage.status === 200) {
+                    var parser = new DOMParser();
+                    _this.htmlDocument = parser.parseFromString(requestForPage.response, "text/html");
+                    _this.loaded = true;
+                    onDone();
+                }
+            }
+        };
+        requestForPage.send(null);
+    };
+    CrackedArticlePage.prototype.getUrl = function () {
+        return this.url;
+    };
+    CrackedArticlePage.prototype.getPageNumber = function () {
+        return this.pageNumber;
+    };
+    CrackedArticlePage.prototype.loadAllImages = function () {
+        var allImageElements = this.htmlDocument.getElementsByTagName("img");
+        for (var i = 0; i < allImageElements.length; i++) {
+            var imageElement = allImageElements[i];
+            var imageUrl = imageElement.getAttribute("data-img");
+            imageElement.removeAttribute("data-img");
+            imageElement.src = imageUrl;
+        }
+    };
+    return CrackedArticlePage;
+})();
+window.onload = function () {
+    var article = new CrackedArticle(window.location.href);
     article.loadAllPages();
 };
-
-
-
-
-
 ///**
 // * Created by pablo on 20/12/15.
 // */
@@ -171,7 +169,6 @@ window.onload = () => {
 //    }
 //
 //}
-
 //function findNumberOfPages () : number {
 //    return Number(document.getElementsByClassName("paginationNumber")[1].textContent);
 //}
@@ -193,8 +190,6 @@ window.onload = () => {
 //    let info = regexp.exec(urlOfFirstPage);
 //    return info[1];
 //}
-
-
 //function fetchContentFromPageAndAppendWhenReadyMobile(url: string, pageNumber: number) : void {
 //    let requestForPage = new XMLHttpRequest();
 //    requestForPage.open("GET", url, true);
@@ -223,7 +218,6 @@ window.onload = () => {
 //    requestForPage.send(null);
 //
 //}
-
 //function fetchContentFromPageAndAppendWhenReady (url: string, pageNumber: number) : void {
 //
 //    let requestForPage = new XMLHttpRequest();
@@ -253,7 +247,6 @@ window.onload = () => {
 //    requestForPage.send(null);
 //
 //}
-
 //function repositionSocialAndPaginationButtons () : void {
 //    const likeOnFacebookWidget = document.getElementsByClassName("FacebookLike")[0];
 //    const paginationNavBar = document.getElementsByClassName("PaginationContent")[0];
@@ -305,7 +298,6 @@ window.onload = () => {
 //        imageElement.src = imageUrl;
 //    }
 //}
-
 //function getArticleSectionElementFromDocument (htmlDocument: HTMLDocument): any {
 //    const article = htmlDocument.getElementsByTagName("article")[0];
 //    if (article !== null && typeof (article) !== "undefined") {
@@ -313,7 +305,9 @@ window.onload = () => {
 //        return bodySection.getElementsByTagName("section")[0];
 //    }
 //}
-
 //function getArticleElementFromDocument (htmlDocument: HTMLDocument): HTMLElement {
 //    return htmlDocument.getElementsByTagName("article")[0];
 //}
+//# sourceMappingURL=onepagecrackedoo.js.map
+
+//# sourceMappingURL=onepagecrackedoo-compiled.js.map
