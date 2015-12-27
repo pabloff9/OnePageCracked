@@ -12,7 +12,7 @@ var pageMod = require("sdk/page-mod");
 pageMod.PageMod(
     {
         include: "http://www.cracked.com/*",
-        contentScriptFile: "./onepagecracked.js"
+        contentScriptFile: "./onepagecrackedoo.js"
     }
 );
 

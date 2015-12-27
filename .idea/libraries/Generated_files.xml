@@ -4,11 +4,14 @@
       <sourceFilesUrls>
         <item url="file://$PROJECT_DIR$/data/onepagecracked-compiled.js" />
         <item url="file://$PROJECT_DIR$/index-compiled.js" />
+        <item url="file://$PROJECT_DIR$/onepagecrackedmobile-compiled.js" />
       </sourceFilesUrls>
     </properties>
     <CLASSES>
+      <root url="file://$PROJECT_DIR$/test/test-onepagecracked-compiled.js" />
       <root url="file://$PROJECT_DIR$/data/onepagecracked-compiled.js" />
       <root url="file://$PROJECT_DIR$/index-compiled.js" />
+      <root url="file://$PROJECT_DIR$/onepagecrackedmobile-compiled.js" />
     </CLASSES>
     <SOURCES />
   </library>

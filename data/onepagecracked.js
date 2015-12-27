@@ -43,11 +43,11 @@ function fetchContentFromPageAndAppendWhenReady (url, pageNumber) {
     requestForPage.onload = function () {
         if (requestForPage.readyState === XMLHttpRequest.DONE) {
             if (requestForPage.status === 200) {
-                parser = new DOMParser();
-                parsedDocument = parser.parseFromString(requestForPage.response, "text/html");
+                const parser = new DOMParser();
+                const parsedDocument = parser.parseFromString(requestForPage.response, "text/html");
                 articleSectionsFromTheOtherPages[pageNumber] = getArticleSectionElementFromDocument(parsedDocument);
 
-                if (pageNumber === numberOfPages) {
+                if (pageNumber === numberOfPages) { // are we on the last page?
                     goToNextArticleAnchor = parsedDocument.getElementsByClassName("blueArrowNext")[0];
                 }
 
