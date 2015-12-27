@@ -50,7 +50,7 @@ class CrackedArticle implements CrackedPost {
         }
     }
 
-    updatePagesCount () : void {
+    updatePagesCount (): void {
         const totalPagesNumberElement = document.getElementsByClassName("paginationNumber")[1];
         totalPagesNumberElement.textContent = "1";
     }
@@ -75,7 +75,7 @@ class CrackedArticle implements CrackedPost {
         }
     }
 
-    private areAllPagesLoaded() : boolean {
+    private areAllPagesLoaded(): boolean {
         for (let page of this.pages) {
             if (!page.isLoaded()) {
                 return false;
@@ -111,15 +111,15 @@ class CrackedArticle implements CrackedPost {
         return info[1];
     }
 
-    private replaceNextPageWithNextArticle () : void {
+    private replaceNextPageWithNextArticle (): void {
         const nextPageAnchor = document.getElementsByClassName("next")[0];
         const parent = nextPageAnchor.parentElement;
         parent.removeChild(nextPageAnchor);
         parent.appendChild(this.getNextArticleAnchor());
     }
 
-    private getNextArticleAnchor() : Element {
-        return this.pages[this.pages.length-1].getHTMLDocument().getElementsByClassName("blueArrowNext")[0]
+    private getNextArticleAnchor(): Element {
+        return this.pages[this.pages.length - 1].getHTMLDocument().getElementsByClassName("blueArrowNext")[0];
     }
 
 }
@@ -150,7 +150,7 @@ class CrackedArticlePage implements CrackedPage {
     }
 
     appendContentFromPage(page: CrackedPage): void {
-        this.getContentElement().parentNode.appendChild(page.getContentElement())
+        this.getContentElement().parentNode.appendChild(page.getContentElement());
     }
 
     getContentElement(): Element {
@@ -203,7 +203,7 @@ class CrackedArticlePage implements CrackedPage {
 }
 
 window.onload = () => {
-    var article = new CrackedArticle(window.location.href);
+    let article = new CrackedArticle(window.location.href);
     article.loadAllPages();
 };
 
